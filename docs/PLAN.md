@@ -1,6 +1,6 @@
 # Kidlog – plan og datamodell (utkast v0.1)
 
-Status: **utkast til avklaring**. Spørsmålene i kapittel 7 må besvares før implementasjon starter.
+Status: **avklart** (2026-09-11). Beslutningene står i kapittel 7.
 Der det står «Anbefaling» er det forslaget som brukes hvis ikke annet bestemmes.
 
 ---
@@ -135,9 +135,11 @@ interface Settings {
 | Navn | Slag | Ekstra felt | Boks på hovedskjerm |
 |---|---|---|---|
 | Søvn | duration | – | ja |
-| Måltid | point *(se spørsmål)* | mengde (ml), side (V/H), type (bryst/flaske/fast) | ja |
+| Måltid | point | mengde (ml), type (flaske/fast) | ja |
+| Amming | duration | side: venstre / høyre | ja |
 | Bleie | point | innhold: tiss / bæsj / begge | ja |
 | Tur | duration | – | ja |
+| Lek | duration | – | nei |
 | Bad | point | – | nei |
 | Medisin | point | navn/dose (tekst) | nei |
 | Notat | point | fritekst | ja |
@@ -198,14 +200,16 @@ dag én. Det gir mer friksjon (utviklerkontoer, byggetjeneste) men er fullt muli
 
 ## 6. Faser
 
-1. **Avklaring** – dette dokumentet + svar på spørsmålene under.
-2. **Fundament** – prosjektoppsett, datamodell, lagring, standardtyper, enhetstester for
-   utledningslogikk (våken-tid, tid siden sist).
-3. **Hovedskjerm** – hurtigbokser med timere, tidslinje med intervaller, angre.
-4. **Oppsett** – barn (navn, fødselsdato, alder), aktivitetstyper (egne + standard), velge bokser.
-5. **Retting** – rediger/slett/bakdater loggpunkt, håndtering av glemt «våknet».
-6. **Nytte** – dagsoppsummering, eksport/backup, PWA-installasjon.
-7. **Senere** – deling mellom to foreldre (sync), påminnelser, app-butikk via Capacitor.
+| Fase | Innhold | Status |
+|---|---|---|
+| 1. Avklaring | Dette dokumentet + beslutninger i kapittel 7 | ✅ ferdig |
+| 2. Fundament | Prosjektoppsett (React + Vite + TS, PWA), datamodell, lagring bak `Repository`-grensesnitt, standardtyper, enhetstester | ✅ ferdig |
+| 3. Hovedskjerm | Hurtigbokser med timere, tidslinje med våken-perioder og intervaller, angre, «Vis eldre» | ✅ ferdig |
+| 4. Oppsett | Barn (navn, fødselsdato, alder, flere barn), aktivitetstyper (standard + egne, felt, rekkefølge, vis/skjul) | ✅ ferdig |
+| 5. Retting | Rediger/slett/bakdater loggpunkt, validering (slutt før start, overlapp), «Sovnet igjen?»-dialog | ✅ ferdig |
+| 6. Nytte | JSON-eksport/-import ✅, PWA-installasjon ✅, dagsoppsummering ⏳ | delvis |
+| 7. Hosting | Publisere bygget slik at appen kan åpnes på telefonen | ⏳ neste |
+| 8. Senere | Skylagring og deling mellom to foreldre, påminnelser, app-butikk via Capacitor | – |
 
 ---
 
@@ -215,15 +219,15 @@ Se svar/beslutninger som fylles inn her etter hvert.
 
 | # | Spørsmål | Anbefaling | Beslutning |
 |---|---|---|---|
-| 1 | PWA (nettapp på hjemskjerm) eller native app i App Store/Play fra start? | PWA først, Capacitor senere | |
-| 2 | Skal to personer (f.eks. begge foreldre) kunne logge på samme barn fra hver sin telefon i v1? | Nei i v1, men modellen forberedes | |
-| 3 | Flere barn (tvillinger/søsken) i v1? | Modell: ja. UI: enkel barn-velger | |
-| 4 | Måltid: øyeblikk eller varighet? Hvilke felt (ml, side, bryst/flaske/fast)? | Øyeblikk, med valgfrie felt | |
-| 5 | Tidslinje: nyeste nederst (chat-stil, knapper nederst) eller nyeste øverst? | Nyeste nederst, knapper nederst | |
-| 6 | Hva er «en dag»? Midnatt, eller starter dagen ved morgenvekking? | Midnatt, sammenhengende tidslinje | |
-| 7 | Bleie som standardtype? Andre standarder som mangler? | Ja: Søvn, Måltid, Bleie, Tur, Bad, Medisin, Notat | |
-| 8 | Dagsoppsummering/statistikk i v1 eller senere? | Fase 6 (etter kjernen fungerer) | |
-| 9 | Eksport/backup (JSON/CSV) i v1? | Ja, enkel JSON-eksport | |
-| 10 | Påminnelser («3 timer siden mat»)? | Senere | |
-| 11 | Språk: kun norsk, eller forberedt for flere? | Norsk UI, tekster samlet i én fil | |
-| 12 | Hvordan håndtere glemt «våknet» når man trykker «sovnet» igjen? | Spør: «Barnet er registrert sovende siden 13:00 – når våknet det?» | |
+| 1 | PWA (nettapp på hjemskjerm) eller native app i App Store/Play fra start? | PWA først, Capacitor senere | PWA først |
+| 2 | Skal to personer (f.eks. begge foreldre) kunne logge på samme barn fra hver sin telefon i v1? | Nei i v1, men modellen forberedes | Nei i v1, modell forberedes |
+| 3 | Flere barn (tvillinger/søsken) i v1? | Modell: ja. UI: enkel barn-velger | Ja i modell, enkel barn-velger |
+| 4 | Måltid: øyeblikk eller varighet? Hvilke felt (ml, side, bryst/flaske/fast)? | Øyeblikk, med valgfrie felt | Øyeblikk. «Amming» blir egen varighetstype med venstre/høyre |
+| 5 | Tidslinje: nyeste nederst (chat-stil, knapper nederst) eller nyeste øverst? | Nyeste nederst, knapper nederst | Nyeste nederst, knapper nederst |
+| 6 | Hva er «en dag»? Midnatt, eller starter dagen ved morgenvekking? | Midnatt, sammenhengende tidslinje | Midnatt, sammenhengende tidslinje |
+| 7 | Bleie som standardtype? Andre standarder som mangler? | Ja: Søvn, Måltid, Bleie, Tur, Bad, Medisin, Notat | Ja, pluss «Lek» (varighet) |
+| 8 | Dagsoppsummering/statistikk i v1 eller senere? | Fase 6 (etter kjernen fungerer) | Etter hvert |
+| 9 | Eksport/backup (JSON/CSV) i v1? | Ja, enkel JSON-eksport | Forberedes for skylagring (lagringslag bak et grensesnitt; iCloud e.l. ved native iOS senere) |
+| 10 | Påminnelser («3 timer siden mat»)? | Senere | Senere |
+| 11 | Språk: kun norsk, eller forberedt for flere? | Norsk UI, tekster samlet i én fil | All kode på engelsk. UI norsk i v1, i18n-struktur for flere språk |
+| 12 | Hvordan håndtere glemt «våknet» når man trykker «sovnet» igjen? | Spør: «Barnet er registrert sovende siden 13:00 – når våknet det?» | Appen spør «når våknet barnet?» og lukker forrige søvn |
